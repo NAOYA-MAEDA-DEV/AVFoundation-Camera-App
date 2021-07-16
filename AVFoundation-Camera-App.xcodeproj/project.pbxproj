@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		DE6EC06D269B12E400BB443B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6EC06C269B12E400BB443B /* AppDelegate.swift */; };
 		DE6EC06F269B12E400BB443B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6EC06E269B12E400BB443B /* SceneDelegate.swift */; };
-		DE6EC071269B12E400BB443B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6EC070269B12E400BB443B /* ViewController.swift */; };
-		DE6EC074269B12E400BB443B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DE6EC072269B12E400BB443B /* Main.storyboard */; };
+		DE6EC071269B12E400BB443B /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6EC070269B12E400BB443B /* CameraViewController.swift */; };
+		DE6EC074269B12E400BB443B /* CameraScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DE6EC072269B12E400BB443B /* CameraScreen.storyboard */; };
 		DE6EC076269B12E500BB443B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE6EC075269B12E500BB443B /* Assets.xcassets */; };
 		DE6EC079269B12E500BB443B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DE6EC077269B12E500BB443B /* LaunchScreen.storyboard */; };
 		DE6EC084269B12E500BB443B /* AVFoundation_Camera_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6EC083269B12E500BB443B /* AVFoundation_Camera_AppTests.swift */; };
@@ -38,8 +38,8 @@
 		DE6EC069269B12E400BB443B /* AVFoundation-Camera-App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AVFoundation-Camera-App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE6EC06C269B12E400BB443B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DE6EC06E269B12E400BB443B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		DE6EC070269B12E400BB443B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		DE6EC073269B12E400BB443B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DE6EC070269B12E400BB443B /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		DE6EC073269B12E400BB443B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/CameraScreen.storyboard; sourceTree = "<group>"; };
 		DE6EC075269B12E500BB443B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE6EC078269B12E500BB443B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DE6EC07A269B12E500BB443B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -101,8 +101,8 @@
 			children = (
 				DE6EC06C269B12E400BB443B /* AppDelegate.swift */,
 				DE6EC06E269B12E400BB443B /* SceneDelegate.swift */,
-				DE6EC070269B12E400BB443B /* ViewController.swift */,
-				DE6EC072269B12E400BB443B /* Main.storyboard */,
+				DE6EC070269B12E400BB443B /* CameraViewController.swift */,
+				DE6EC072269B12E400BB443B /* CameraScreen.storyboard */,
 				DE6EC075269B12E500BB443B /* Assets.xcassets */,
 				DE6EC077269B12E500BB443B /* LaunchScreen.storyboard */,
 				DE6EC07A269B12E500BB443B /* Info.plist */,
@@ -233,7 +233,7 @@
 			files = (
 				DE6EC079269B12E500BB443B /* LaunchScreen.storyboard in Resources */,
 				DE6EC076269B12E500BB443B /* Assets.xcassets in Resources */,
-				DE6EC074269B12E400BB443B /* Main.storyboard in Resources */,
+				DE6EC074269B12E400BB443B /* CameraScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,7 +258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE6EC071269B12E400BB443B /* ViewController.swift in Sources */,
+				DE6EC071269B12E400BB443B /* CameraViewController.swift in Sources */,
 				DE6EC06D269B12E400BB443B /* AppDelegate.swift in Sources */,
 				DE6EC06F269B12E400BB443B /* SceneDelegate.swift in Sources */,
 			);
@@ -296,12 +296,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		DE6EC072269B12E400BB443B /* Main.storyboard */ = {
+		DE6EC072269B12E400BB443B /* CameraScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				DE6EC073269B12E400BB443B /* Base */,
 			);
-			name = Main.storyboard;
+			name = CameraScreen.storyboard;
 			sourceTree = "<group>";
 		};
 		DE6EC077269B12E500BB443B /* LaunchScreen.storyboard */ = {

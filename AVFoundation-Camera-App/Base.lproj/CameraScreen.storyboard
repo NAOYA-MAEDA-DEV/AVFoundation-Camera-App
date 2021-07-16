@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Camera View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="CameraViewController" customModule="AVFoundation_Camera_App" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jLL-oT-aMZ">
+                                <rect key="frame" x="0.0" y="657" width="414" height="205"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jsh-4k-5e1">
+                                        <rect key="frame" x="166" y="61.5" width="82" height="82"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="Jsh-4k-5e1" secondAttribute="height" multiplier="1:1" id="WLu-Cv-lGh"/>
+                                        </constraints>
+                                        <state key="normal" backgroundImage="PhotoShutterButton"/>
+                                        <connections>
+                                            <action selector="shutterButtonTUP:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uqV-1Q-LEt"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="Jsh-4k-5e1" firstAttribute="centerX" secondItem="jLL-oT-aMZ" secondAttribute="centerX" id="bCX-By-lQ2"/>
+                                    <constraint firstItem="Jsh-4k-5e1" firstAttribute="centerY" secondItem="jLL-oT-aMZ" secondAttribute="centerY" id="do1-KM-UIw"/>
+                                    <constraint firstItem="Jsh-4k-5e1" firstAttribute="height" secondItem="jLL-oT-aMZ" secondAttribute="height" multiplier="0.4" id="fXZ-tf-9gj"/>
+                                </constraints>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Rdu-oH-FdR">
+                                <rect key="frame" x="0.0" y="105" width="414" height="552"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Rdu-oH-FdR" secondAttribute="height" multiplier="3:4" id="1zY-mt-rKj"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="jLL-oT-aMZ" firstAttribute="top" secondItem="Rdu-oH-FdR" secondAttribute="bottom" id="CNr-t6-BRM"/>
+                            <constraint firstItem="Rdu-oH-FdR" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" multiplier="0.85" id="H3l-xH-2AZ"/>
+                            <constraint firstItem="jLL-oT-aMZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="JJH-hR-2Ua"/>
+                            <constraint firstItem="Rdu-oH-FdR" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="LQT-yN-DGu"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="jLL-oT-aMZ" secondAttribute="trailing" id="P7L-Rb-7SR"/>
+                            <constraint firstItem="Rdu-oH-FdR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QVA-UH-BCa"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jLL-oT-aMZ" secondAttribute="bottom" id="h22-XZ-kfy"/>
+                            <constraint firstItem="Rdu-oH-FdR" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="lyr-Bg-xaI"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="previewImageView" destination="Rdu-oH-FdR" id="O0b-zr-LAL"/>
+                        <outlet property="shutterButton" destination="Jsh-4k-5e1" id="PXz-74-Zym"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="15.942028985507248" y="93.75"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="PhotoShutterButton" width="50" height="50"/>
+    </resources>
+</document>
