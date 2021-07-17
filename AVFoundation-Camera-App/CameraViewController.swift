@@ -13,6 +13,8 @@ final class CameraViewController: UIViewController {
     
     @IBOutlet weak var previewImageView: UIImageView!
     @IBOutlet weak var shutterButton: UIButton!
+    @IBOutlet weak var changeModeSegmentControl: UISegmentedControl!
+    
     
     private let captureSession = AVCaptureSession()
     private var captureVideoLayer: AVCaptureVideoPreviewLayer!
@@ -34,10 +36,16 @@ final class CameraViewController: UIViewController {
         case configurationFailed // Failed
     }
     
-    private var shootingMode: ShootingMode = .photo
+    private var shootingMode: ShootingMode = .photo // Shooting Mode
     enum ShootingMode: Int {
         case photo
         case video
+    }
+    
+    private var captureState: captureState = .wait // VkideoCapture State
+    enum captureState: Int {
+        case wait
+        case capturing
     }
     
     private var compressedData: Data?
@@ -189,10 +197,36 @@ final class CameraViewController: UIViewController {
      @brief 写真を撮影する
      */
     @IBAction func shutterButtonTUP(_ sender: Any) {
-        self.settingsForMonitoring = AVCapturePhotoSettings()
-        self.settingsForMonitoring.embeddedThumbnailPhotoFormat = [AVVideoCodecKey : AVVideoCodecType.jpeg]
-        self.settingsForMonitoring.isHighResolutionPhotoEnabled = false
-        self.photoOutput.capturePhoto(with: self.settingsForMonitoring, delegate: self)
+        switch self.shootingMode {
+        case.photo:
+            self.settingsForMonitoring = AVCapturePhotoSettings()
+            self.settingsForMonitoring.embeddedThumbnailPhotoFormat = [AVVideoCodecKey : AVVideoCodecType.jpeg]
+            self.settingsForMonitoring.isHighResolutionPhotoEnabled = false
+            self.photoOutput.capturePhoto(with: self.settingsForMonitoring, delegate: self)
+            
+        case .video:
+            switch self.captureState {
+            case .wait:
+                AudioServicesPlaySystemSound(1117)
+                
+                let tempDirectory: URL = URL(fileURLWithPath: NSTemporaryDirectory())
+                let fileURL: URL = tempDirectory.appendingPathComponent("sampletemp.mov")
+                
+                self.movieFileOutput.startRecording(to: fileURL, recordingDelegate: self)
+                self.captureState = .capturing
+                
+                self.changeModeSegmentControl.isEnabled = false
+                
+            case .capturing:
+                AudioServicesPlaySystemSound(1118)
+                
+                self.movieFileOutput.stopRecording()
+                self.captureState = .wait
+                
+                self.shutterButton.isEnabled = false
+            }
+     
+        }
     }
     
     
@@ -215,8 +249,7 @@ final class CameraViewController: UIViewController {
             self.chageVideoMode()
 
         @unknown default:
-            print("Your password wasn't suitable.")
-
+            print("Insufficient case definitione.")
         }
 
     }
@@ -228,17 +261,17 @@ final class CameraViewController: UIViewController {
     private func chagePhotoMode() {
         self.captureSession.beginConfiguration()
         
-        // 入力ソースをキャプチャセッションにセット
+
         if let input = self.audioDeviceInput {
             self.captureSession.removeInput(input)
         }
         
-        // 出力タイプをキャプチャセッションにセット
+
         if self.captureSession.canAddOutput(self.photoOutput) {
             self.captureSession.addOutput(self.photoOutput)
         }
         
-        // ムービー出力タイプをキャプチャセッションから削除
+
         self.captureSession.removeOutput(self.movieFileOutput)
         
         captureSession.commitConfiguration()
@@ -251,22 +284,21 @@ final class CameraViewController: UIViewController {
     private func chageVideoMode() {
         self.captureSession.beginConfiguration()
         
-        // 入力ソースの生成
         guard let audioDevice = AVCaptureDevice.default(for: .audio) else {
             return
         }
         
         do {
             let input = try AVCaptureDeviceInput(device: audioDevice)
-            // 入力ソースをキャプチャセッションにセット
+
             if self.captureSession.canAddInput(input) {
                 self.captureSession.addInput(input)
                 self.audioDeviceInput = input
-                // 出力タイプをキャプチャセッションにセット
+
                 if self.captureSession.canAddOutput(self.movieFileOutput) {
                     self.captureSession.addOutput(self.movieFileOutput)
                 }
-                // 写真出力タイプをキャプチャセッションから削除
+
                 self.captureSession.removeOutput(self.photoOutput)
             }
         } catch {
@@ -292,7 +324,6 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             return
         }
         
-        // Access the file data representation of this photo.
         guard let photoData = photo.fileDataRepresentation() else {
             print("No photo data to write.")
             return
@@ -312,7 +343,6 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             return
         }
         
-        // Ensure the RAW and processed photo data exists.
         guard let compressedData = self.compressedData else {
             self.shutterButton.isEnabled = true
             print("The expected photo data isn't available.")
@@ -335,3 +365,40 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
     }
     
 }
+
+
+extension CameraViewController: AVCaptureFileOutputRecordingDelegate {
+    
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: outputFileURL)
+        }) { _, error in
+            DispatchQueue.main.async {
+                self.shutterButton.isEnabled = true
+                self.changeModeSegmentControl.isEnabled = true
+            }
+
+            if let error = error {
+                print(error)
+            }
+            
+            cleanup()
+        }
+        
+        // ビデオ保存用に一時的に使用したファイルパス先のビデオファイルを削除する
+        func cleanup() {
+            let path = outputFileURL.path
+            if FileManager.default.fileExists(atPath: path) {
+                do {
+                    try FileManager.default.removeItem(atPath: path)
+                } catch {
+                    print("remove error")
+                }
+            }
+        }
+    }
+    
+}
+    
+
+

@@ -69,6 +69,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="changeModeSegmentControl" destination="Rue-Ie-7GO" id="RQh-aI-XdY"/>
                         <outlet property="previewImageView" destination="Rdu-oH-FdR" id="O0b-zr-LAL"/>
                         <outlet property="shutterButton" destination="Jsh-4k-5e1" id="PXz-74-Zym"/>
                     </connections>
