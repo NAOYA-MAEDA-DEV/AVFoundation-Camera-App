@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>It&apos;s required for taking videos with sounds.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>It&apos;s required for saving photos and editting photos.</string>
 	<key>NSCameraUsageDescription</key>

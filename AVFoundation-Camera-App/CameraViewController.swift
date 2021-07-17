@@ -18,9 +18,11 @@ final class CameraViewController: UIViewController {
     private var captureVideoLayer: AVCaptureVideoPreviewLayer!
     private let photoOutput = AVCapturePhotoOutput()
     private let videoDataOutput = AVCaptureVideoDataOutput()
+    private let movieFileOutput = AVCaptureMovieFileOutput()
     
     private var currentDevice: AVCaptureDevice?
-    private var videoDeviceInput: AVCaptureDeviceInput!
+    private var videoDeviceInput: AVCaptureDeviceInput?
+    private var audioDeviceInput: AVCaptureDeviceInput?
     private var settingsForMonitoring =  AVCapturePhotoSettings()
     
     private let sessionQueue = DispatchQueue(label: "session_queue")
@@ -30,6 +32,12 @@ final class CameraViewController: UIViewController {
         case success // Success
         case notAuthorized // No permisson to Camera device or Photo album
         case configurationFailed // Failed
+    }
+    
+    private var shootingMode: ShootingMode = .photo
+    enum ShootingMode: Int {
+        case photo
+        case video
     }
     
     private var compressedData: Data?
@@ -178,7 +186,7 @@ final class CameraViewController: UIViewController {
     
     
     /**
-     @brief Capture photo
+     @brief 写真を撮影する
      */
     @IBAction func shutterButtonTUP(_ sender: Any) {
         self.settingsForMonitoring = AVCapturePhotoSettings()
@@ -189,11 +197,85 @@ final class CameraViewController: UIViewController {
     
     
     /**
-     @brief ChangeShooting mode
+     @brief 撮影モードを変更する
      */
-    @IBAction func changeShootingMode(_ sender: Any) {
+    @IBAction func changeShootingMode(_ sender: UISegmentedControl) {
         
+        guard let mode = ShootingMode(rawValue: sender.selectedSegmentIndex) else {
+            return
+        }
         
+        self.shootingMode = mode
+        
+        switch self.shootingMode {
+        case .photo:
+            self.chagePhotoMode()
+            
+        case .video:
+            self.chageVideoMode()
+
+        @unknown default:
+            print("Your password wasn't suitable.")
+
+        }
+
+    }
+    
+    
+    /**
+     @brief 写真撮影モードに変更する
+     */
+    private func chagePhotoMode() {
+        self.captureSession.beginConfiguration()
+        
+        // 入力ソースをキャプチャセッションにセット
+        if let input = self.audioDeviceInput {
+            self.captureSession.removeInput(input)
+        }
+        
+        // 出力タイプをキャプチャセッションにセット
+        if self.captureSession.canAddOutput(self.photoOutput) {
+            self.captureSession.addOutput(self.photoOutput)
+        }
+        
+        // ムービー出力タイプをキャプチャセッションから削除
+        self.captureSession.removeOutput(self.movieFileOutput)
+        
+        captureSession.commitConfiguration()
+    }
+    
+    
+    /**
+     @brief ビデオ撮影モードに変更する
+     */
+    private func chageVideoMode() {
+        self.captureSession.beginConfiguration()
+        
+        // 入力ソースの生成
+        guard let audioDevice = AVCaptureDevice.default(for: .audio) else {
+            return
+        }
+        
+        do {
+            let input = try AVCaptureDeviceInput(device: audioDevice)
+            // 入力ソースをキャプチャセッションにセット
+            if self.captureSession.canAddInput(input) {
+                self.captureSession.addInput(input)
+                self.audioDeviceInput = input
+                // 出力タイプをキャプチャセッションにセット
+                if self.captureSession.canAddOutput(self.movieFileOutput) {
+                    self.captureSession.addOutput(self.movieFileOutput)
+                }
+                // 写真出力タイプをキャプチャセッションから削除
+                self.captureSession.removeOutput(self.photoOutput)
+            }
+        } catch {
+            print(error)
+            self.captureSession.commitConfiguration()
+            return
+        }
+        
+        captureSession.commitConfiguration()
     }
     
     
