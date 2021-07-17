@@ -40,7 +40,7 @@ final class CameraViewController: UIViewController {
         case video
     }
     
-    private var captureState: captureState = .wait // VkideoCapture State
+    private var captureState: captureState = .wait // VideoCapture State
     enum captureState: Int {
         case wait
         case capturing
@@ -109,8 +109,10 @@ final class CameraViewController: UIViewController {
     }
     
     
+    /**
+     @brief Check camera and photo library permission.
+     */
     private func checkPermission() {
-        // Camera
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             break
@@ -129,7 +131,6 @@ final class CameraViewController: UIViewController {
             break
         }
         
-        // Photo album
         switch PHPhotoLibrary.authorizationStatus() {
         case .authorized:
             break
@@ -146,10 +147,12 @@ final class CameraViewController: UIViewController {
     }
     
     
+    /**
+     @brief Configure session for launch the app.
+     */
     private func configureSession() {
         guard setupResult == .success else { return }
         self.captureSession.beginConfiguration()
-        // 入力ソースの生成
         do {
             var defaultVideoDevice: AVCaptureDevice?
             if let backCameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
@@ -163,17 +166,18 @@ final class CameraViewController: UIViewController {
             }
             
             currentDevice = videoDevice
-            // 入力ソースをキャプチャセッションにセット
+            
             let input = try AVCaptureDeviceInput(device: videoDevice)
             if self.captureSession.canAddInput(input) {
                 self.captureSession.addInput(input)
                 self.videoDeviceInput = input
-                // 出力タイプをキャプチャセッションにセット
+                
                 if self.captureSession.canAddOutput(self.photoOutput) {
                     self.captureSession.addOutput(self.photoOutput)
-                    // カメラのプレビュー映像を表示するViewの指定
+                    
                     self.captureVideoLayer = AVCaptureVideoPreviewLayer.init(session: self.captureSession)
                     self.captureVideoLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+                    
                     DispatchQueue.main.async {
                         self.captureVideoLayer.frame = self.previewImageView.bounds
                         self.previewImageView.contentMode = .scaleAspectFill
@@ -192,21 +196,18 @@ final class CameraViewController: UIViewController {
     
     
     /**
-     @brief 写真撮影モードに変更する
+     @brief Change session for capturing photo.
      */
     private func chagePhotoMode() {
         self.captureSession.beginConfiguration()
-        
 
         if let input = self.audioDeviceInput {
             self.captureSession.removeInput(input)
         }
-        
 
         if self.captureSession.canAddOutput(self.photoOutput) {
             self.captureSession.addOutput(self.photoOutput)
         }
-        
 
         self.captureSession.removeOutput(self.movieFileOutput)
         
@@ -215,7 +216,7 @@ final class CameraViewController: UIViewController {
     
     
     /**
-     @brief ビデオ撮影モードに変更する
+     @brief Change session for capturing video.
      */
     private func chageVideoMode() {
         self.captureSession.beginConfiguration()
@@ -238,7 +239,7 @@ final class CameraViewController: UIViewController {
                 self.captureSession.removeOutput(self.photoOutput)
             }
         } catch {
-            print(error)
+            print("Error change capture session for capturing video : \(error)")
             self.captureSession.commitConfiguration()
             return
         }
@@ -248,7 +249,7 @@ final class CameraViewController: UIViewController {
     
     
     /**
-     @brief 写真を撮影する
+     @brief Take photo or recording or finish recording video.
      */
     @IBAction func shutterButtonTUP(_ sender: Any) {
         switch self.shootingMode {
@@ -263,8 +264,7 @@ final class CameraViewController: UIViewController {
             case .wait:
                 AudioServicesPlaySystemSound(1117)
                 
-                let tempDirectory: URL = URL(fileURLWithPath: NSTemporaryDirectory())
-                let fileURL: URL = tempDirectory.appendingPathComponent("sampletemp.mov")
+                let fileURL: URL = self.makeUniqueTempFileURL(extension: "mov")
                 
                 self.movieFileOutput.startRecording(to: fileURL, recordingDelegate: self)
                 self.captureState = .capturing
@@ -279,16 +279,14 @@ final class CameraViewController: UIViewController {
                 
                 self.shutterButton.isEnabled = false
             }
-     
         }
     }
     
     
     /**
-     @brief 撮影モードを変更する
+     @brief Change shooting mode.
      */
     @IBAction func changeShootingMode(_ sender: UISegmentedControl) {
-        
         guard let mode = ShootingMode(rawValue: sender.selectedSegmentIndex) else {
             return
         }
@@ -305,7 +303,19 @@ final class CameraViewController: UIViewController {
         @unknown default:
             print("Insufficient case definitione.")
         }
-
+    }
+    
+    
+    /**
+     @brief Create unique url string.
+     - parameter type : extension type
+     */
+    private func makeUniqueTempFileURL(extension type: String) -> URL {
+        let temporaryDirectoryURL = FileManager.default.temporaryDirectory
+        let uniqueFilename = ProcessInfo.processInfo.globallyUniqueString
+        let urlNoExt = temporaryDirectoryURL.appendingPathComponent(uniqueFilename)
+        let url = urlNoExt.appendingPathExtension(type)
+        return url
     }
     
 }
@@ -381,7 +391,7 @@ extension CameraViewController: AVCaptureFileOutputRecordingDelegate {
             cleanup()
         }
         
-        // ビデオ保存用に一時的に使用したファイルパス先のビデオファイルを削除する
+        // Clean file path.
         func cleanup() {
             let path = outputFileURL.path
             if FileManager.default.fileExists(atPath: path) {
@@ -395,6 +405,3 @@ extension CameraViewController: AVCaptureFileOutputRecordingDelegate {
     }
     
 }
-    
-
-
