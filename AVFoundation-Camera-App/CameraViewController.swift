@@ -172,7 +172,7 @@ final class CameraViewController: UIViewController {
                 return
             }
             
-            currentDevice = videoDevice
+            self.currentDevice = videoDevice
             
             let input = try AVCaptureDeviceInput(device: videoDevice)
             if self.captureSession.canAddInput(input) {
@@ -194,11 +194,13 @@ final class CameraViewController: UIViewController {
                 self.captureSession.sessionPreset = AVCaptureSession.Preset.photo
             }
         } catch {
+            print("Error configure capture session : \(error)")
+            
             self.setupResult = .configurationFailed
             self.captureSession.commitConfiguration()
             return
         }
-        captureSession.commitConfiguration()
+        self.captureSession.commitConfiguration()
     }
     
     
@@ -329,7 +331,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         
         guard error == nil else {
-            print("Error capturing photo: \(error!)")
+            print("Error broken photo data: \(error!)")
             return
         }
         
@@ -348,7 +350,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         
         guard error == nil else {
             self.shutterButton.isEnabled = true
-            print("Error capturing photo: \(error!)")
+            print("Error capture photo: \(error!)")
             return
         }
         
@@ -368,6 +370,10 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             } completionHandler: { success, error in
                 DispatchQueue.main.async {
                     self.shutterButton.isEnabled = true
+                }
+                
+                if let _ = error {
+                    print("Error save photo: \(error!)")
                 }
             }
         }
@@ -401,7 +407,7 @@ extension CameraViewController: AVCaptureFileOutputRecordingDelegate {
                 do {
                     try FileManager.default.removeItem(atPath: path)
                 } catch {
-                    print("remove error")
+                    print("Error clean up: \(error)")
                 }
             }
         }
