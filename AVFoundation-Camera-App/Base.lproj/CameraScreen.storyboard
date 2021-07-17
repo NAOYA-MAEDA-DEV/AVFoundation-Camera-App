@@ -42,10 +42,21 @@
                                     <constraint firstAttribute="width" secondItem="Rdu-oH-FdR" secondAttribute="height" multiplier="3:4" id="1zY-mt-rKj"/>
                                 </constraints>
                             </imageView>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Rue-Ie-7GO">
+                                <rect key="frame" x="151.5" y="611" width="111" height="32"/>
+                                <segments>
+                                    <segment title="Photo"/>
+                                    <segment title="Video"/>
+                                </segments>
+                                <connections>
+                                    <action selector="changeShootingMode:" destination="BYZ-38-t0r" eventType="valueChanged" id="YCp-s5-nGy"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="Rue-Ie-7GO" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6Q6-te-lXd"/>
                             <constraint firstItem="jLL-oT-aMZ" firstAttribute="top" secondItem="Rdu-oH-FdR" secondAttribute="bottom" id="CNr-t6-BRM"/>
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" multiplier="0.85" id="H3l-xH-2AZ"/>
                             <constraint firstItem="jLL-oT-aMZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="JJH-hR-2Ua"/>
@@ -54,9 +65,11 @@
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QVA-UH-BCa"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jLL-oT-aMZ" secondAttribute="bottom" id="h22-XZ-kfy"/>
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="lyr-Bg-xaI"/>
+                            <constraint firstItem="jLL-oT-aMZ" firstAttribute="top" secondItem="Rue-Ie-7GO" secondAttribute="bottom" constant="15" id="nfZ-eq-EjP"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="changeModeSegmentControl" destination="Rue-Ie-7GO" id="RQh-aI-XdY"/>
                         <outlet property="previewImageView" destination="Rdu-oH-FdR" id="O0b-zr-LAL"/>
                         <outlet property="shutterButton" destination="Jsh-4k-5e1" id="PXz-74-Zym"/>
                     </connections>
