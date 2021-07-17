@@ -186,6 +186,17 @@ final class CameraViewController: UIViewController {
         self.settingsForMonitoring.isHighResolutionPhotoEnabled = false
         self.photoOutput.capturePhoto(with: self.settingsForMonitoring, delegate: self)
     }
+    
+    
+    /**
+     @brief ChangeShooting mode
+     */
+    @IBAction func changeShootingMode(_ sender: Any) {
+        
+        
+    }
+    
+    
 
 }
 
