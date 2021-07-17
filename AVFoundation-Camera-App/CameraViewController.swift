@@ -15,11 +15,9 @@ final class CameraViewController: UIViewController {
     @IBOutlet weak var shutterButton: UIButton!
     @IBOutlet weak var changeModeSegmentControl: UISegmentedControl!
     
-    
     private let captureSession = AVCaptureSession()
     private var captureVideoLayer: AVCaptureVideoPreviewLayer!
     private let photoOutput = AVCapturePhotoOutput()
-    private let videoDataOutput = AVCaptureVideoDataOutput()
     private let movieFileOutput = AVCaptureMovieFileOutput()
     
     private var currentDevice: AVCaptureDevice?
@@ -111,7 +109,7 @@ final class CameraViewController: UIViewController {
     }
     
     
-    func checkPermission() {
+    private func checkPermission() {
         // Camera
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -148,7 +146,7 @@ final class CameraViewController: UIViewController {
     }
     
     
-    func configureSession() {
+    private func configureSession() {
         guard setupResult == .success else { return }
         self.captureSession.beginConfiguration()
         // 入力ソースの生成
@@ -189,6 +187,62 @@ final class CameraViewController: UIViewController {
             self.captureSession.commitConfiguration()
             return
         }
+        captureSession.commitConfiguration()
+    }
+    
+    
+    /**
+     @brief 写真撮影モードに変更する
+     */
+    private func chagePhotoMode() {
+        self.captureSession.beginConfiguration()
+        
+
+        if let input = self.audioDeviceInput {
+            self.captureSession.removeInput(input)
+        }
+        
+
+        if self.captureSession.canAddOutput(self.photoOutput) {
+            self.captureSession.addOutput(self.photoOutput)
+        }
+        
+
+        self.captureSession.removeOutput(self.movieFileOutput)
+        
+        captureSession.commitConfiguration()
+    }
+    
+    
+    /**
+     @brief ビデオ撮影モードに変更する
+     */
+    private func chageVideoMode() {
+        self.captureSession.beginConfiguration()
+        
+        guard let audioDevice = AVCaptureDevice.default(for: .audio) else {
+            return
+        }
+        
+        do {
+            let input = try AVCaptureDeviceInput(device: audioDevice)
+
+            if self.captureSession.canAddInput(input) {
+                self.captureSession.addInput(input)
+                self.audioDeviceInput = input
+
+                if self.captureSession.canAddOutput(self.movieFileOutput) {
+                    self.captureSession.addOutput(self.movieFileOutput)
+                }
+
+                self.captureSession.removeOutput(self.photoOutput)
+            }
+        } catch {
+            print(error)
+            self.captureSession.commitConfiguration()
+            return
+        }
+        
         captureSession.commitConfiguration()
     }
     
@@ -254,64 +308,6 @@ final class CameraViewController: UIViewController {
 
     }
     
-    
-    /**
-     @brief 写真撮影モードに変更する
-     */
-    private func chagePhotoMode() {
-        self.captureSession.beginConfiguration()
-        
-
-        if let input = self.audioDeviceInput {
-            self.captureSession.removeInput(input)
-        }
-        
-
-        if self.captureSession.canAddOutput(self.photoOutput) {
-            self.captureSession.addOutput(self.photoOutput)
-        }
-        
-
-        self.captureSession.removeOutput(self.movieFileOutput)
-        
-        captureSession.commitConfiguration()
-    }
-    
-    
-    /**
-     @brief ビデオ撮影モードに変更する
-     */
-    private func chageVideoMode() {
-        self.captureSession.beginConfiguration()
-        
-        guard let audioDevice = AVCaptureDevice.default(for: .audio) else {
-            return
-        }
-        
-        do {
-            let input = try AVCaptureDeviceInput(device: audioDevice)
-
-            if self.captureSession.canAddInput(input) {
-                self.captureSession.addInput(input)
-                self.audioDeviceInput = input
-
-                if self.captureSession.canAddOutput(self.movieFileOutput) {
-                    self.captureSession.addOutput(self.movieFileOutput)
-                }
-
-                self.captureSession.removeOutput(self.photoOutput)
-            }
-        } catch {
-            print(error)
-            self.captureSession.commitConfiguration()
-            return
-        }
-        
-        captureSession.commitConfiguration()
-    }
-    
-    
-
 }
 
 
