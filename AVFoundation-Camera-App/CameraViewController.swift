@@ -151,7 +151,14 @@ final class CameraViewController: UIViewController {
      @brief Configure session for launch the app.
      */
     private func configureSession() {
-        guard setupResult == .success else { return }
+        guard setupResult == .success else {
+            DispatchQueue.main.async {
+                self.shutterButton.isEnabled = false
+                self.changeModeSegmentControl.isEnabled = false
+            }
+            return
+        }
+        
         self.captureSession.beginConfiguration()
         do {
             var defaultVideoDevice: AVCaptureDevice?
@@ -211,7 +218,7 @@ final class CameraViewController: UIViewController {
 
         self.captureSession.removeOutput(self.movieFileOutput)
         
-        captureSession.commitConfiguration()
+        self.captureSession.commitConfiguration()
     }
     
     
@@ -221,30 +228,26 @@ final class CameraViewController: UIViewController {
     private func chageVideoMode() {
         self.captureSession.beginConfiguration()
         
-        guard let audioDevice = AVCaptureDevice.default(for: .audio) else {
-            return
-        }
-        
-        do {
-            let input = try AVCaptureDeviceInput(device: audioDevice)
+        if let audioDevice = AVCaptureDevice.default(for: .audio) {
+            do {
+                let input = try AVCaptureDeviceInput(device: audioDevice)
 
-            if self.captureSession.canAddInput(input) {
-                self.captureSession.addInput(input)
-                self.audioDeviceInput = input
-
-                if self.captureSession.canAddOutput(self.movieFileOutput) {
-                    self.captureSession.addOutput(self.movieFileOutput)
+                if self.captureSession.canAddInput(input) {
+                    self.captureSession.addInput(input)
+                    self.audioDeviceInput = input
                 }
-
-                self.captureSession.removeOutput(self.photoOutput)
+            } catch {
+                print("Error input audio device to capture session : \(error)")
             }
-        } catch {
-            print("Error change capture session for capturing video : \(error)")
-            self.captureSession.commitConfiguration()
-            return
         }
         
-        captureSession.commitConfiguration()
+        if self.captureSession.canAddOutput(self.movieFileOutput) {
+            self.captureSession.addOutput(self.movieFileOutput)
+        }
+
+        self.captureSession.removeOutput(self.photoOutput)
+        
+        self.captureSession.commitConfiguration()
     }
     
     
