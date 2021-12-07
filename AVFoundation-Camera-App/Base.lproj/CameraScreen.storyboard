@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -43,15 +45,22 @@
                                 </constraints>
                             </imageView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Rue-Ie-7GO">
-                                <rect key="frame" x="151.5" y="611" width="111" height="32"/>
+                                <rect key="frame" x="71" y="611" width="272" height="32"/>
                                 <segments>
                                     <segment title="Photo"/>
                                     <segment title="Video"/>
+                                    <segment title="Live Photos"/>
                                 </segments>
                                 <connections>
                                     <action selector="changeShootingMode:" destination="BYZ-38-t0r" eventType="valueChanged" id="YCp-s5-nGy"/>
                                 </connections>
                             </segmentedControl>
+                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LIVE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RB4-Ss-7Yd">
+                                <rect key="frame" x="191.5" y="588" width="31" height="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" systemColor="systemOrangeColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -63,6 +72,8 @@
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="LQT-yN-DGu"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="jLL-oT-aMZ" secondAttribute="trailing" id="P7L-Rb-7SR"/>
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QVA-UH-BCa"/>
+                            <constraint firstItem="RB4-Ss-7Yd" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Qgz-ws-OHa"/>
+                            <constraint firstItem="Rue-Ie-7GO" firstAttribute="top" secondItem="RB4-Ss-7Yd" secondAttribute="bottom" constant="5" id="S1s-0t-DSO"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jLL-oT-aMZ" secondAttribute="bottom" id="h22-XZ-kfy"/>
                             <constraint firstItem="Rdu-oH-FdR" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="lyr-Bg-xaI"/>
                             <constraint firstItem="jLL-oT-aMZ" firstAttribute="top" secondItem="Rue-Ie-7GO" secondAttribute="bottom" constant="15" id="nfZ-eq-EjP"/>
@@ -70,6 +81,7 @@
                     </view>
                     <connections>
                         <outlet property="changeModeSegmentControl" destination="Rue-Ie-7GO" id="RQh-aI-XdY"/>
+                        <outlet property="livePhotosLabel" destination="RB4-Ss-7Yd" id="Fzk-SB-mkb"/>
                         <outlet property="previewImageView" destination="Rdu-oH-FdR" id="O0b-zr-LAL"/>
                         <outlet property="shutterButton" destination="Jsh-4k-5e1" id="PXz-74-Zym"/>
                     </connections>
@@ -81,5 +93,8 @@
     </scenes>
     <resources>
         <image name="PhotoShutterButton" width="50" height="50"/>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>
