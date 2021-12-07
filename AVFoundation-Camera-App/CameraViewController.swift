@@ -14,6 +14,7 @@ final class CameraViewController: UIViewController {
     @IBOutlet weak var previewImageView: UIImageView!
     @IBOutlet weak var shutterButton: UIButton!
     @IBOutlet weak var changeModeSegmentControl: UISegmentedControl!
+    @IBOutlet weak var livePhotosLabel: UILabel!
     
     private let captureSession = AVCaptureSession()
     private var captureVideoLayer: AVCaptureVideoPreviewLayer!
@@ -27,6 +28,8 @@ final class CameraViewController: UIViewController {
     
     private let sessionQueue = DispatchQueue(label: "session_queue")
     
+    var livePhotoCompanionMovieURL: URL?
+    
     private var setupResult: SessionSetupResult = .success // Session Setup Result
     enum SessionSetupResult {
         case success // Success
@@ -38,6 +41,7 @@ final class CameraViewController: UIViewController {
     enum ShootingMode: Int {
         case photo
         case video
+        case livephotos
     }
     
     private var captureState: captureState = .wait // VideoCapture State
@@ -191,6 +195,19 @@ final class CameraViewController: UIViewController {
                         self.previewImageView.layer.addSublayer(self.captureVideoLayer)
                     }
                 }
+                
+                if let audioDevice = AVCaptureDevice.default(for: .audio) {
+                    do {
+                        let input = try AVCaptureDeviceInput(device: audioDevice)
+
+                        if self.captureSession.canAddInput(input) {
+                            self.captureSession.addInput(input)
+                            self.audioDeviceInput = input
+                        }
+                    } catch {
+                        print("Error input audio device to capture session : \(error)")
+                    }
+                }
                 self.captureSession.sessionPreset = AVCaptureSession.Preset.photo
             }
         } catch {
@@ -210,10 +227,6 @@ final class CameraViewController: UIViewController {
     private func chagePhotoMode() {
         self.captureSession.beginConfiguration()
 
-        if let input = self.audioDeviceInput {
-            self.captureSession.removeInput(input)
-        }
-
         if self.captureSession.canAddOutput(self.photoOutput) {
             self.captureSession.addOutput(self.photoOutput)
         }
@@ -225,23 +238,30 @@ final class CameraViewController: UIViewController {
     
     
     /**
+     @brief Change session for capturing livephotos.
+     */
+    private func chageLivePhotosMode() {
+        self.captureSession.beginConfiguration()
+
+        if self.captureSession.canAddOutput(self.photoOutput) {
+            self.captureSession.addOutput(self.photoOutput)
+        }
+
+        self.captureSession.removeOutput(self.movieFileOutput)
+        
+        if self.photoOutput.isLivePhotoCaptureSupported {
+            self.photoOutput.isLivePhotoCaptureEnabled = true
+        }
+        
+        self.captureSession.commitConfiguration()
+    }
+    
+    
+    /**
      @brief Change session for capturing video.
      */
     private func chageVideoMode() {
         self.captureSession.beginConfiguration()
-        
-        if let audioDevice = AVCaptureDevice.default(for: .audio) {
-            do {
-                let input = try AVCaptureDeviceInput(device: audioDevice)
-
-                if self.captureSession.canAddInput(input) {
-                    self.captureSession.addInput(input)
-                    self.audioDeviceInput = input
-                }
-            } catch {
-                print("Error input audio device to capture session : \(error)")
-            }
-        }
         
         if self.captureSession.canAddOutput(self.movieFileOutput) {
             self.captureSession.addOutput(self.movieFileOutput)
@@ -284,6 +304,19 @@ final class CameraViewController: UIViewController {
                 
                 self.shutterButton.isEnabled = false
             }
+            
+        case .livephotos:
+            self.settingsForMonitoring = AVCapturePhotoSettings()
+            self.settingsForMonitoring.embeddedThumbnailPhotoFormat = [AVVideoCodecKey : AVVideoCodecType.jpeg]
+            self.settingsForMonitoring.isHighResolutionPhotoEnabled = false
+            
+            if self.photoOutput.isLivePhotoCaptureSupported {
+                // 動画の保存先URLの作成
+                let livePhotoMovieFileName = NSUUID().uuidString
+                let livePhotoMovieFilePath = (NSTemporaryDirectory() as NSString).appendingPathComponent((livePhotoMovieFileName as NSString).appendingPathExtension("mov")!)
+                settingsForMonitoring.livePhotoMovieFileURL = URL(fileURLWithPath: livePhotoMovieFilePath)
+            }
+            self.photoOutput.capturePhoto(with: self.settingsForMonitoring, delegate: self)
         }
     }
     
@@ -304,6 +337,9 @@ final class CameraViewController: UIViewController {
             
         case .video:
             self.chageVideoMode()
+            
+        case .livephotos:
+            self.chageLivePhotosMode()
 
         @unknown default:
             print("Insufficient case definitione.")
@@ -344,6 +380,26 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
 
     }
     
+    func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if self.shootingMode == .livephotos {
+            self.livePhotosLabel.alpha = 1
+        }
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishRecordingLivePhotoMovieForEventualFileAt outputFileURL: URL, resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if self.shootingMode == .livephotos {
+            self.livePhotosLabel.alpha = 0
+        }
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingLivePhotoToMovieFileAt outputFileURL: URL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
+        if error != nil {
+            print("Error processing Live Photo companion movie: \(String(describing: error))")
+            return
+        }
+        self.livePhotoCompanionMovieURL = outputFileURL
+    }
+    
     func photoOutput(_ output: AVCapturePhotoOutput,
                      didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings,
                      error: Error?) {
@@ -365,8 +421,13 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             PHPhotoLibrary.shared().performChanges {
                 let creationRequest = PHAssetCreationRequest.forAsset()
                 creationRequest.addResource(with: .photo, data: compressedData, options: nil)
-
-                
+                if let livePhotoCompanionMovieURL = self.livePhotoCompanionMovieURL {
+                    let livePhotoCompanionMovieFileOptions = PHAssetResourceCreationOptions()
+                    livePhotoCompanionMovieFileOptions.shouldMoveFile = true
+                    creationRequest.addResource(with: .pairedVideo,
+                                                fileURL: livePhotoCompanionMovieURL,
+                                                options: livePhotoCompanionMovieFileOptions)
+                }
             } completionHandler: { success, error in
                 DispatchQueue.main.async {
                     self.shutterButton.isEnabled = true
